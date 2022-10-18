@@ -185,4 +185,4 @@ userservice-78dc876bff-pdhtl          1/1     Running   0          96s
 kubectl get service frontend | awk '{print $4}'
 ```
 
-Visit `https://EXTERNAL_IP` to access your instance of Bank of Anthos.
+Visit `http://EXTERNAL_IP` to access your instance of Bank of Anthos.
