@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,25 @@
  * limitations under the License.
  */
 
+terraform {
+  required_version = ">= 1.3.1"
+
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 3.90.1"
+    }
+
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = ">= 3.90.1"
+    }
+  }
+}
 provider "google" {
-  version = "~> 3.8"
   region  = var.region
 }
 provider "google-beta" {
-  version = "~> 3.8"
   region  = var.region
 }
 variable "billing_account" {

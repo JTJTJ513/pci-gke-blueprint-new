@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,16 @@ resource "google_container_cluster" "in_scope" {
   initial_node_count       = local.in_scope_node_pool_initial_node_count
   enable_shielded_nodes    = true
 
+  node_config {
+    shielded_instance_config {
+      enable_secure_boot = true
+    }
+  }
   release_channel {
     channel = local.in_scope_cluster_release_channel
   }
   workload_identity_config {
-    identity_namespace = "${google_project.in_scope.project_id}.svc.id.goog"
+    workload_pool = "${google_project.in_scope.project_id}.svc.id.goog"
   }
   addons_config {
     istio_config {
@@ -86,7 +91,7 @@ resource "google_container_node_pool" "in_scope_node_pool" {
       enable_secure_boot = true
     }
     workload_metadata_config {
-      node_metadata = "GKE_METADATA_SERVER"
+      mode = "GKE_METADATA"
     }
   }
 }
@@ -102,11 +107,16 @@ resource "google_container_cluster" "out_of_scope" {
   initial_node_count       = local.out_of_scope_node_pool_initial_node_count
   enable_shielded_nodes    = true
 
+  node_config {
+    shielded_instance_config {
+      enable_secure_boot = true
+    }
+  }
   release_channel {
     channel = local.out_of_scope_cluster_release_channel
   }
   workload_identity_config {
-    identity_namespace = "${google_project.out_of_scope.project_id}.svc.id.goog"
+    workload_pool = "${google_project.out_of_scope.project_id}.svc.id.goog"
   }
   addons_config {
     istio_config {
@@ -162,7 +172,7 @@ resource "google_container_node_pool" "out_of_scope_node_pool" {
       enable_secure_boot = true
     }
     workload_metadata_config {
-      node_metadata = "GKE_METADATA_SERVER"
+      mode = "GKE_METADATA"
     }
   }
 }
