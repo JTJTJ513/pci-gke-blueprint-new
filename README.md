@@ -2,6 +2,10 @@
 
 ![high level project view](docs/diagrams/highlevel_project_view.png)
 
+This repo was cloned from GoogleCloudPlatform/pci-gke-blueprint, with changes to accommodate updates of relevant
+technology since 2020. After deployment of the infrastructure, please feel free to scroll down to the bottom of
+this README file for steps to deploy the Bank of Anthos demo on top of the infrastructure.
+
 This is the companion repository to the [PCI on GKE Security Blueprint](https://cloud.google.com/architecture/blueprints/gke-pci-dss-blueprint) for the Google Cloud Platform. It
 contains a set of Terraform configurations and scripts to help demonstrate how
 to bootstrap a PCI environment in GCP. When appropriate, we also showcase GCP
@@ -38,9 +42,9 @@ Here are the projects/services we make use of in this Blueprint:
 ## Quickstart
 We recommend you read through the documentation in [Building the Infrastructure](docs/build-infrastructure.md) and [Deploying the Application](docs/deploy-application.md) but if you just want to get started:
 1. Follow the steps in [Prerequisites](#prerequisites)
-1. Set-up the workstation.env file [Workstation Configuration](#workstation-configuration)
-1. Run `./_helpers/build-infra.sh`
-1. Run `./_helpers/deploy-app.sh`
+2. Set up the workstation.env file [Workstation Configuration](#workstation-configuration)
+3. Run `./_helpers/build-infra.sh`
+4. Run `./_helpers/deploy-app.sh` OR deploy Bank of Anthos following the instructions at the bottom of this page.
 
 ## Prerequisites
 
@@ -123,3 +127,61 @@ stepwise instructions for that script in [Building the Infrastructure](docs/buil
 ## Helpful Links
 
 * Significant portions of this project are based on "[Building a multi-cluster service mesh on GKE using replicated control-plane architecture](https://cloud.google.com/solutions/building-a-multi-cluster-service-mesh-on-gke-using-replicated-control-plane-architecture)"
+
+## Bank of Anthos Deployment
+
+The following is a guide to Bank of Anthos deployment on top of the infrastructure you built with the steps above.
+For more details on Bank of Anthos, please refer to [its repository](https://github.com/GoogleCloudPlatform/bank-of-anthos).
+
+1. **Clone the Bank of Anthos repository.**
+
+```
+git clone https://github.com/GoogleCloudPlatform/bank-of-anthos.git
+cd bank-of-anthos/
+```
+
+2. **Get the credentials for your GKE cluster**
+
+We obtain the credentials of the GKE cluster named "in-scope" deployed with the infrastructure.
+Make sure you use the Project ID and the region where you deployed the infrastructure.
+
+```
+gcloud container clusters get-credentials in-scope \
+  --project=${PROJECT_ID} --region=${REGION}
+```
+
+3. **Deploy Bank of Anthos to the cluster.**
+
+```
+kubectl apply -f ./extras/jwt/jwt-secret.yaml
+kubectl apply -f ./kubernetes-manifests
+```
+
+4. **Wait for the Pods to be ready.**
+
+```
+kubectl get pods
+```
+
+After a few minutes, you should see the Pods in a `Running` state:
+
+```
+NAME                                  READY   STATUS    RESTARTS   AGE
+accounts-db-6f589464bc-6r7b7          1/1     Running   0          99s
+balancereader-797bf6d7c5-8xvp6        1/1     Running   0          99s
+contacts-769c4fb556-25pg2             1/1     Running   0          98s
+frontend-7c96b54f6b-zkdbz             1/1     Running   0          98s
+ledger-db-5b78474d4f-p6xcb            1/1     Running   0          98s
+ledgerwriter-84bf44b95d-65mqf         1/1     Running   0          97s
+loadgenerator-559667b6ff-4zsvb        1/1     Running   0          97s
+transactionhistory-5569754896-z94cn   1/1     Running   0          97s
+userservice-78dc876bff-pdhtl          1/1     Running   0          96s
+```
+
+5. **Access the web frontend in a browser** using the frontend's external IP.
+
+```
+kubectl get service frontend | awk '{print $4}'
+```
+
+Visit `https://EXTERNAL_IP` to access your instance of Bank of Anthos.
