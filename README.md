@@ -62,6 +62,7 @@ with the correct permissions.
 ### GCP IAM Requirements
 
 In order to execute this module you will need access to a Google Cloud Organization, with Organization Admin and Folder Admin permissions.
+Make sure you don't have any organization policy restricting the creation of service account keys, such as "Disable service account key creation."
 
 ### Authenticate to gcloud
 
